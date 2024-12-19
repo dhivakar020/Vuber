@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rider Page</title>
+  </head>
+  <body>
+    <h1>Welcome Rider</h1>
+    <p>
+      This is the rider's dashboard where riders can request rides, view
+      history, and more.
+    </p>
+    <button id="logoutButton">Logout</button>
+
+    <script>
+      document.getElementById("logoutButton").onclick = function () {
+        localStorage.removeItem("access_token"); // Clear the token
+        window.location.href = "/login.html"; // Redirect to login
+      };
+    </script>
+  </body>
+</html>

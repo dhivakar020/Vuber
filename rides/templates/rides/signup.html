@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+  </head>
+  <body>
+    <h1>Signup</h1>
+    <form id="signupForm">
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="Enter your email"
+        required
+      />
+      <br /><br />
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="Enter your password"
+        required
+      />
+      <br /><br />
+      <label for="role">Role:</label>
+      <select name="role" id="role" required>
+        <option value="rider">Rider</option>
+        <option value="driver">Driver</option>
+      </select>
+      <br /><br />
+      <button type="submit">Signup</button>
+    </form>
+    <p id="responseMessage"></p>
+
+    <script>
+      document.getElementById("signupForm").onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        // Include timestamps (optional; the backend can also handle this)
+        data.created_at = new Date().toISOString();
+        data.updated_at = new Date().toISOString();
+
+        const response = await fetch("/rides/signup/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const messageElement = document.getElementById("responseMessage");
+        if (response.ok) {
+          messageElement.textContent = "Signup successful! You can now log in.";
+          messageElement.style.color = "green";
+        } else {
+          const result = await response.json();
+          messageElement.textContent = `Signup failed: ${
+            result.error || "Unknown error"
+          }`;
+          messageElement.style.color = "red";
+        }
+      };
+    </script>
+  </body>
+</html>

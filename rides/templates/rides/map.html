@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ride Request Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Request a Ride</h1>
+    <div id="map"></div>
+    <button id="request-ride-btn">Request Ride</button>
+
+    <script>
+      const map = L.map("map").setView([11.0168, 76.9558], 13); // Gandhipuram, Coimbatore
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+      }).addTo(map);
+
+      const pickupMarker = L.marker([11.0168, 76.9558], {
+        draggable: true,
+      }).addTo(map);
+      const destMarker = L.marker([11.0305, 76.9672], {
+        draggable: true,
+      }).addTo(map);
+
+      let pickupLat, pickupLng, destLat, destLng;
+
+      pickupMarker.on("dragend", function (e) {
+        const position = e.target.getLatLng();
+        pickupLat = position.lat;
+        pickupLng = position.lng;
+      });
+
+      destMarker.on("dragend", function (e) {
+        const position = e.target.getLatLng();
+        destLat = position.lat;
+        destLng = position.lng;
+      });
+
+      document
+        .getElementById("request-ride-btn")
+        .addEventListener("click", function () {
+          if (pickupLat && pickupLng && destLat && destLng) {
+            fetch("/rides/request-ride/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                pickup_lat: pickupLat,
+                pickup_lng: pickupLng,
+                dest_lat: destLat,
+                dest_lng: destLng,
+                rider_id: 1, // Replace with actual rider ID in production
+              }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  alert(
+                    "Ride requested successfully! Ride ID: " + data.ride_id
+                  );
+                } else {
+                  alert("An error occurred while requesting the ride.");
+                }
+              })
+              .catch((error) => {
+                alert("An error occurred. Please try again.");
+                console.error(error);
+              });
+          } else {
+            alert("Please select both pickup and destination locations.");
+          }
+        });
+    </script>
+  </body>
+</html>
